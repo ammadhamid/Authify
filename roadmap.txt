@@ -1,0 +1,9 @@
+Authify APP 
+Features 
+NextJS - Express - MongoDB 
+features : 
+Secure Login with OAuth
+NextAuth for Authentication 
+Multifactor Authentication(by speakeasy package)
+Email verification : nodemailer
+cooke-session csrf
