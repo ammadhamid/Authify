@@ -1,0 +1,76 @@
+ Your Authify Remaining Feature Checklist
+✅ 1. Authentication & Verification
+Feature	Status
+Signup (with OTP)	✅ Done
+Login (with isVerified check)	✅ Done
+Forgot Password	✅ Done
+Reset Password	✅ Done
+Verify OTP (for signup)	✅ Done
+Verify Forgot Password	✅ Done
+Protected Routes (e.g., /me)	✅ Done
+Protect Routes Middleware	✅ Done
+JWT Token Handling	✅ Done
+JWT Secret Handling	✅ Done
+.env Management	✅ Good
+Error Handling	✅ Good
+OTP Expiry Logic	✅ Done
+Resend OTP	⏸️ Skipped Bad me krunga
+
+🔐 2. RBAC (Role-Based Access Control)
+Feature	Status	Note
+Role field in User model	✅ Done	`"admin"
+Middleware: checkRole("admin") ✅ Done
+Protected Admin Routes	✅ Done  auth.middleware.ts
+Authorize Admin Middleware	✅ Done isAdmin.middleware.ts
+
+🧑‍💼 3. Admin Panel Features
+Feature	Status
+View all users	✅ Done
+Update user roles	✅ Done
+Delete a user	✅ Done
+Search / Filter users	✅ Done
+
+Remaining Backend Features:
+🔹 1. Rate Limiting  ✅ Done
+Prevent abuse (e.g., multiple OTPs or login attempts)
+
+➤ Use express-rate-limit
+
+➤ Apply it on:
+
+OTP send endpoints
+
+Login route
+
+
+🔹 3. Analytics (Optional but good to add) ✅ Done
+Total users
+
+Number of admins vs users
+
+Verified vs unverified users
+
+Can return counts from User.countDocuments() queries
+
+GOOGLE 0AUTH
+
+
+🔹 5. Email Templates (Optional Enhancements) After Frontend
+Use styled HTML templates for OTP emails using MJML or ejs/handlebars
+
+
+
+🎨 5. Frontend (Next.js)
+Page/Component	Status
+Signup → OTP	❌
+Login	❌
+Forgot Password → Reset	❌
+Dashboard (user)	❌
+Admin Panel UI	❌
+
+📦 6. Deployment (Final Phase)
+Task	Tool/Platform
+Frontend → Vercel	✅ Suggested
+Backend → Railway/Render	✅ Suggested
+MongoDB → Atlas	✅ Suggested
+Env setup in prod	❌ Don’t forget
