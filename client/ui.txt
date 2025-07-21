@@ -1,0 +1,89 @@
+PROJECT NAME
+Authify – Secure Authentication & Admin Platform
+
+BRAND & VISUAL STYLE
+• Primary color: #2563EB (blue‑600)
+• Accent color: #14B8A6 (teal‑500)
+• Neutral surface: #F8FAFC (slate‑50) – light mode; #0F172A (slate‑900) – dark mode
+• Font: Inter (weights 400, 500, 700)
+• Border radius scale: sm 4 px, md 8 px, lg 12 px, xl 32 px
+• Shadows: soft, medium elevation (similar to Tailwind “shadow‑lg”)
+• Global 3D background: subtle animated particles (dark translucent)
+• Motion: Framer‑style 200 ms ease‑out fades & slides between pages
+• Components follow ShadCN UI aesthetics (clean, outline inputs, bold headings)
+
+SCREENS & CONTENT
+
+1. LOGIN
+  • Centered Card (w‑380 px) with animated fade‑in
+  • Logo top, heading “Welcome back”
+  • Email field, Password field (min 6 chars)
+  • Primary Button: “Log in”
+  • Divider “or”
+  • OAuth buttons: Google, GitHub (icon‑left)
+  • Link: “Forgot password?”
+  • Validation errors inline under fields
+
+2. SIGNUP
+  • Similar Card layout
+  • Fields: Name, Email, Password, Confirm Password
+  • CTA: “Create account”
+  • Sub‑text: “Have an account? Log in”
+  • On success redirect to OTP screen
+
+3. OTP VERIFY
+  • Minimal Card
+  • Instruction text: “We’ve sent a 6‑digit code to john@example.com”
+  • Six equal‑width inputs (one digit each) auto‑focus shift
+  • Button: “Verify”
+  • Resend link with 60 s countdown
+
+4. FORGOT PASSWORD
+  • Email input only
+  • CTA: “Send reset code”
+
+5. RESET PASSWORD
+  • Fields: 6‑digit OTP, New Password, Confirm Password
+  • CTA: “Reset password”
+
+6. DASHBOARD – USER
+  • Responsive sidebar + top navbar
+  • Widgets:
+      – Profile card: avatar, email, “Verified” badge
+      – Security section: Change Password button
+  • Colorful welcome header with particles overlay
+
+7. CHANGE PASSWORD MODAL
+  • Dialog with old password, new password, confirm
+  • Save & Cancel buttons
+
+8. ADMIN USERS LIST
+  • Table with columns: Avatar, Name, Email, Role (dropdown), Status, Actions
+  • Actions: Delete (trash icon), Edit Role (dropdown inline)
+  • Search bar & pagination footer
+
+9. ADMIN ANALYTICS
+  • Grid of metric cards: Total Users, New Today, Verified %, Admin Count
+  • Area chart of weekly sign‑ups
+  • Pie chart of roles distribution
+  • Download CSV button
+
+10. NOT FOUND / 404
+  • Large “404” heading, “Page not found”, button back to login
+
+INTERACTION & ANIMATION NOTES
+• Card components slide‑up & fade‑in on mount
+• Buttons show a spinner icon while submitting
+• Sidebar collapses to icons on mobile
+• Toast notifications slide in bottom‑right, auto‑dismiss 4 s
+• Dark‑mode toggle in navbar (sun/moon icon)
+
+ACCESSIBILITY & RESPONSIVENESS
+• WCAG AA color contrast
+• Keyboard‑focus rings on all interactive elements
+• Layouts stack vertically below 640 px width
+
+HAND‑OFF REQUIREMENTS
+• Provide Figma frames for light & dark mode
+• Export Tailwind class names or variables on inspect
+• Separate components in reusable variants (Button, Input, Card, TableRow, ChartCard)

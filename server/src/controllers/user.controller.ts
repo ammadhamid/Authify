@@ -8,9 +8,12 @@ import {
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const { name, email, role, password } = req.body;
+    const { firstname , lastName, email /*, role*/, password } = req.body;
+    const name = firstname+lastName;
 
-    if ([name, email, role, password].some((field) => field?.trim() === "")) {
+    if (
+      [name, email /*, role*/, password].some((field) => field?.trim() === "")
+    ) {
       return res.status(400).json({
         message: "All fields are required",
       });
@@ -21,7 +24,7 @@ export const registerUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "User already Exist" });
     }
 
-    const user = new User({ name, email, role, password });
+    const user = new User({ name, email, password });
     await user.save();
 
     // if (!process.env.JWT_SECRET) {
@@ -41,7 +44,7 @@ export const registerUser = async (req: Request, res: Response) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: "user",
       },
     });
   } catch (error) {

@@ -1,0 +1,96 @@
+Authify Frontend — Clear Roadmap (Feature‑by‑Feature, in build order)
+Think of each bullet as a sprint ticket. Finish it, test it, then move on.
+Follow this sequence and you’ll never wonder “what’s next?”.
+
+🅰️ FOUNDATION
+Project scaffold
+
+Next 15 App Router, TS, Tailwind 4, ShadCN, Framer Motion ✔️ (done)
+
+Design system seed
+
+Create UI kit: Button, Input, Card, Typography tokens.
+
+Set primary/secondary colors, dark‑mode toggle.
+
+🅱️ AUTH FLOW (MVP)
+Mirror backend endpoints one‑for‑one.
+
+Step	Page / Component	Backend route it calls	Acceptance test
+1	Login page (credentials)	POST /login	Valid creds → redirects to /dashboard
+2	Signup page	POST /signup	Sends OTP email, redirects to /verify-otp
+3	OTP Verify page	POST /verify-otp	Correct OTP → logged‑in session
+4	Forgot Password page	POST /forgot-password	Shows “OTP sent” toast
+5	Reset Password page	POST /reset-password	New password accepted
+
+Tech specifics: Use React Hook Form + Zod on each page; call signIn("credentials") for login/signup after the backend responds OK.
+
+🅲️ SESSION & ROUTE PROTECTION
+NextAuth credentials provider wired (JWT stored in session).
+
+Middleware.ts
+
+Blocks /dashboard/** if no session.
+
+Blocks /admin/** if session.role !== admin.
+
+Global AuthProvider hook to expose user, isVerified, role.
+
+🅳️ DASHBOARD (User)
+Feature	Route	UI pieces
+Profile summary	/dashboard	Avatar, email, “verified” badge
+Update password	/dashboard/security	RHF form, calls /change-password
+Notification prefs (future)	/dashboard/notifications	Toggle switches
+
+🅴️ ADMIN PANEL
+Feature	Route	API	Notes
+Users list	/admin/users	GET /admin/users	Table, pagination
+Edit role	inline	PUT /admin/role/:id	ShadCN Select
+Delete user	inline	DELETE /admin/:id	Confirm dialog
+Analytics	/admin/analytics	GET /admin/metrics	Charts (Recharts)
+
+🅵️ POLISH & UX
+3D / particles background in app/layout.tsx (react‑tsparticles).
+
+Page transitions with Framer Motion (fade/slide).
+
+Toast notifications (ShadCN toast or sonner).
+
+Accessible focus states & keyboard nav audit.
+
+Responsive tweaks for mobile.
+
+🅶️ NICE‑TO‑HAVES (after MVP)
+Google & GitHub OAuth buttons (signIn("google"), "github").
+
+Theme switcher (dark/light system detection).
+
+Password strength meter (zxcvbn).
+
+Rate‑limit error handling: show cooldown timer.
+
+Live metrics via websockets on Admin Analytics.
+
+🚦 Build Order Checklist
+UI kit primitives (1 day)
+
+Login page → session confirmed (½ day)
+
+Signup + OTP verify (1½ days)
+
+Forgot / Reset password (1 day)
+
+Middleware route guards (½ day)
+
+Dashboard profile + change‑pw (1 day)
+
+Admin: users table CRUD (2 days)
+
+Admin: analytics charts (1 day)
+
+Global polish & animations (ongoing)
+
+Tackle them in that order; each stage unlocks the next and keeps your scope clear.
+
+Next action:
+Finish Step 2 of AUTH FLOW (Signup page) or whichever you haven’t done yet, then ping me with progress/blockers. We’ll zoom into the exact page and validation logic like we did for the Login card.
