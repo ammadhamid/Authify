@@ -1,17 +1,16 @@
-"use client"
-import LoginForm from "@/components/auth/LoginForm";
-import React from "react";
-import Image from "next/image";
+import NavBar from "@/components/NavBar";
+import LoginForm from "@/components/auth/LoginForm"; // Adjust path if needed
+import Link from "next/link";
 
 export default function LoginPage() {
   return (
-    <div className="singupPage flex-between">
-      <div className="left hidden sm:inline h-[600] w-[774px] ">
-        <Image width={647} height={584} src={"/login_background.png"} alt="login_image" />
-      </div>
-      <div className="right md:w-[587px] md:h-[600px]">
-        <LoginForm />
-      </div>
+    <div className="bg-gray-50 min-h-screen">
+      <NavBar />
+      <main className="flex flex-col items-center justify-center py-12 px-4">
+        <div className="w-full max-w-md">
+          <LoginForm />
+        </div>
+      </main>
     </div>
   );
 }

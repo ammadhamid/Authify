@@ -1,206 +1,173 @@
+// components/auth/SignupForm.tsx
+
 "use client";
 
-import React from "react";
-import { Input } from "../ui/input";
-import { z } from "zod";
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import axios from "axios";
+import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import Oauth from "./Oauth";
+import {toast} from "sonner"
 import SeperatorLines from "../helpers/Seperator.helper";
-import { useRouter } from "next/navigation";
-
-
-
+import { Eye, EyeOff, LoaderCircle, AlertCircle } from "lucide-react";
 
 const SignUpSchema = z
   .object({
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.string().email(),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
+    firstname: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: z.string().email("Please enter a valid email"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
   })
-  .refine((d) => d.password === d.confirmPassword, {
-    error: "Password do not Match",
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
 type SignUpFormFields = z.infer<typeof SignUpSchema>;
 
 function SignupForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
+
   const {
     register,
-    reset,
-    formState: { errors, isSubmitting },
     handleSubmit,
+    formState: { errors, isSubmitting },
     setError,
+    reset,
   } = useForm<SignUpFormFields>({
-    defaultValues: {
-      email: "john123@doe.com",
-    },
     resolver: zodResolver(SignUpSchema),
   });
-
-  const router = useRouter();
 
   const onSubmit = async (data: SignUpFormFields) => {
     try {
       const response = await axios.post(
         "http://localhost:8000/api/users/signup",
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        data
       );
-      alert(response.data.message);
-      reset();
-      router.push("/signup/verify-otp")
-
+      localStorage.setItem("emailForVerification", data.email);
+      toast.success(response.data.message || "Signup successful!"); // Using toast is better!
+    reset();
+    router.push("/signup/verify-otp");
     } catch (error: any) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        setError("root", { message: error.response.data.message });
-      } else {
-        setError("root", { message: "An unexpected Error Occured" });
-      }
+      const message =
+        error.response?.data?.message || "An unexpected error occurred.";
+      setError("root", { message });
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="
-    max-w-[420px]
-    w-full
-    mx-auto
-    bg-white
-    rounded-2xl
-    shadow
-    p-6
-    flex
-    flex-col
-    gap-4
-  "
-    >
-      <div className="flex flex-col items-center gap-2">
-        <h1 className="text-2xl md:text-3xl font-playfair font-semibold text-center">
-          Sign Up Account
+    <div className="w-full bg-white p-8 rounded-xl shadow-md border border-gray-200">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+          Create an Account
         </h1>
-        <p className="text-sm font-poppins md:text-base text-center text-gray-700">
-          Enter You Personal data to create your account.
+        <p className="text-gray-600 mt-2">
+          Get started with Authify for free.
         </p>
       </div>
 
-      <div className="flex flex-row items-center justify-center gap-4 mt-2 mb-1">
-        <Oauth />
-      </div>
+      <Oauth />
+      <SeperatorLines text="OR" />
 
-      <SeperatorLines />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="firstname">First Name</Label>
+            <Input id="firstname" type="text" {...register("firstname")} />
+            {errors.firstname && (
+              <p className="text-xs text-red-600">{errors.firstname.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="lastName">Last Name</Label>
+            <Input id="lastName" type="text" {...register("lastName")} />
+            {errors.lastName && (
+              <p className="text-xs text-red-600">{errors.lastName.message}</p>
+            )}
+          </div>
+        </div>
 
-      <div className="flex flex-col md:flex-row gap-3 w-full">
-        <div className="flex-1 flex flex-col gap-1">
-          <Label>First Name</Label>
-          <Input
-            className="bg-black text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-            type="text"
-            placeholder="eg. John"
-            {...register("firstName", { required: true })}
-          />
-          {errors.firstName && (
-            <div className="text-red-500 text-xs">
-              {errors.firstName.message}
-            </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email Address</Label>
+          <Input id="email" type="email" {...register("email")} />
+          {errors.email && (
+            <p className="text-xs text-red-600">{errors.email.message}</p>
           )}
         </div>
-        <div className="flex-1 flex flex-col gap-1">
-          <Label>Last Name</Label>
+
+        <div className="space-y-2 relative">
+          <Label htmlFor="password">Password</Label>
           <Input
-            className="bg-black text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-            type="text"
-            placeholder="eg. John"
-            {...register("lastName", { required: true })}
+            id="password"
+            type={showPassword ? "text" : "password"}
+            className="pr-10"
+            {...register("password")}
           />
-          {errors.lastName && (
-            <div className="text-red-500 text-xs">
-              {errors.lastName.message}
-            </div>
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-9 text-gray-500 hover:text-gray-800"
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+          {errors.password && (
+            <p className="text-xs text-red-600">{errors.password.message}</p>
           )}
         </div>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <Label>Email</Label>
-        <Input
-          className="bg-black text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          type="email"
-          placeholder="eg. John123@gmail.com"
-          {...register("email", { required: true })}
-        />
-        {errors.email && (
-          <div className="text-red-500 text-xs">{errors.email.message}</div>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <Label>Password</Label>
-        <Input
-          className="bg-black text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          type="password"
-          placeholder="Enter Your Password"
-          {...register("password", { required: true, minLength: 8 })}
-        />
-        <span className="text-xs text-gray-500 pl-1">
-          Must be Atleast 8 characters
-        </span>
-        {errors.password && (
-          <div className="text-red-500 text-xs">{errors.password.message}</div>
-        )}
-      </div>
-
-            <div className="flex flex-col gap-1">
-        <Label>Confirm Password</Label>
-        <Input
-          className="bg-black text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          type="password"
-          placeholder="re-enter password"
-          {...register("confirmPassword", { required: true, minLength: 8 })}
-        />
-        <span className="text-xs text-gray-500 pl-1">
-          Please Re-Enter Your Password
-        </span>
-        {errors.password && (
-          <div className="text-red-500 text-xs">{errors.password.message}</div>
-        )}
-      </div>
-
-      <Button
-        type="submit"
-        disabled={isSubmitting}
-        className="bg-black text-white py-2 px-6 rounded-lg mt-2 font-semibold hover:bg-gray-900 transition"
-      >
-        {isSubmitting ? "Loading ..." : "Submit"}
-      </Button>
-
-      <div className="text-center pt-2 text-base">
-        Already have an Account{" "}
-        <a href="/login" className="text-purple-600 underline font-semibold">
-          Login
-        </a>
-      </div>
-      {errors.root && (
-        <div className="text-red-500 text-center text-xs mt-2">
-          {errors.root.message}
+        
+        <div className="space-y-2 relative">
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Input
+            id="confirmPassword"
+            type={showConfirmPassword ? "text" : "password"}
+            className="pr-10"
+            {...register("confirmPassword")}
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-3 top-9 text-gray-500 hover:text-gray-800"
+          >
+            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+          {errors.confirmPassword && (
+            <p className="text-xs text-red-600">{errors.confirmPassword.message}</p>
+          )}
         </div>
-      )}
-    </form>
+        
+        {errors.root && (
+          <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
+            <AlertCircle size={18} />
+            <span>{errors.root.message}</span>
+          </div>
+        )}
+
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-purple-600 text-white hover:bg-purple-700 transition-colors duration-300 flex items-center justify-center gap-2 text-base h-11"
+        >
+          {isSubmitting && <LoaderCircle className="animate-spin" size={20} />}
+          {isSubmitting ? "Creating Account..." : "Create Account"}
+        </Button>
+      </form>
+
+      <p className="text-center text-sm text-gray-600 mt-8">
+        Already have an account?{" "}
+        <Link href="/login" className="font-semibold text-purple-600 hover:underline">
+          Log In
+        </Link>
+      </p>
+    </div>
   );
 }
 

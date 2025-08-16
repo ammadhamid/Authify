@@ -1,45 +1,27 @@
 "use client";
-import { useRouter } from "next/navigation";
+
+import Link from "next/link";
 import { Button } from "./ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
-import Image from "next/image";
 
-const Hero = () => {
-  const router = useRouter();
-
-  const signUp = () => {
-    router.push("/signup");
-  };
-
+const NavBar = () => {
   return (
-    // <Button onClick={signUp}>Signup</Button>
-    <div className=" flex justify-center">
-      <NavigationMenu className="">
-        <NavigationMenuList>
-          <NavigationMenuItem className="flex">
-            <NavigationMenuLink className="ml-6" href="/">
-              <h1 className="font-bold font-poppins text-lg md:text-xl text-black ">
-                Authify
-              </h1>
-            </NavigationMenuLink>
-            <NavigationMenuLink className="ml-6  text-lg md:text-xl text-black" href="/signup">
-              Signup
-            </NavigationMenuLink>
+    <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+      <div className="container mx-auto px-4 flex items-center justify-between h-16">
+        <Link href="/" className="font-bold text-xl text-gray-800">
+          Authify
+        </Link>
 
-            <NavigationMenuLink className="ml-6  text-lg md:text-xl text-black" href="/login">
-              Login
-            </NavigationMenuLink>
-            {/* <NavigationMenuLink>Login</NavigationMenuLink> */}
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-    </div>
+        <div className="flex items-center gap-4">
+          <Button asChild variant="ghost">
+            <Link href="/login">Login</Link>
+          </Button>
+          <Button asChild className="bg-gray-800 hover:bg-gray-900">
+            <Link href="/signup">Sign Up</Link>
+          </Button>
+        </div>
+      </div>
+    </header>
   );
 };
 
-export default Hero;
+export default NavBar;

@@ -1,23 +1,31 @@
+// components/auth/LoginForm.tsx
+
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Input } from "../ui/input";
 import axios from "axios";
+import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import Oauth from "./Oauth";
 import SeperatorLines from "../helpers/Seperator.helper";
+import { Eye, EyeOff, LoaderCircle, AlertCircle } from "lucide-react";
+
+// Schema is good, but let's add more specific error messages
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"), // Changed from min(8) as login doesn't need to validate length
 });
 
 type LoginFormFields = z.infer<typeof loginSchema>;
 
 function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -25,9 +33,6 @@ function LoginForm() {
     reset,
     setError,
   } = useForm<LoginFormFields>({
-    defaultValues: {
-      email: "test123@test.com",
-    },
     resolver: zodResolver(loginSchema),
   });
 
@@ -35,96 +40,98 @@ function LoginForm() {
     try {
       const response = await axios.post(
         "http://localhost:8000/api/users/login",
-        data,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
+        data
       );
-      alert(response.data.message);
+      alert(response.data.message || "Login successful!");
       reset();
+      // TODO: Redirect to the user's dashboard, e.g., router.push('/dashboard');
     } catch (error: any) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        setError("root", { message: error.response.data.message });
-      } else {
-        setError("root", { message: "An unexpected Error Occured" });
-      }
+      const message =
+        error.response?.data?.message || "Invalid credentials. Please try again.";
+      setError("root", { message });
     }
   };
 
   return (
-    <form
-      className="
-    w-full
-    mx-auto
-    bg-white
-    rounded-2xl
-    shadow
-    p-6
-    flex
-    flex-col
-    gap-2
-    "
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <div className="flex flex-col items-center gap-2">
-        <h1 className="font-extrabold font-playfair text-2xl md:text-3xl text-black ">
-          Authify
-        </h1>
-        <h2 className="font-semibold font-playfair text-4xl md:text-6xl text-black">
+    <div className="w-full bg-white p-8 rounded-xl shadow-md border border-gray-200">
+      {/* ## Themed Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
           Welcome Back
-        </h2>
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Sign in to continue to Authify.
+        </p>
       </div>
-      <div className="flex flex-row items-center justify-center gap-4 mt-2 ">
-        <Oauth />
-      </div>
-      <SeperatorLines />
-      <div className="flex flex-col items-center gap-4">
-      <div className="flex-1 flex flex-col gap-2 md:w-96 mb-1">
-        <Label>Email</Label>
-        <Input
-          className="font-poppins bg-black text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          type="email"
-          placeholder="Email"
-          {...register("email")}
-        />
-        {errors.email && (
-          <div className="text-red-500">{errors.email.message}</div>
+
+      {/* ## Themed OAuth & Separator */}
+      <Oauth />
+      <SeperatorLines text="OR" />
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email Address</Label>
+          <Input id="email" type="email" {...register("email")} />
+          {errors.email && (
+            <p className="text-xs text-red-600">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2 relative">
+          <div className="flex justify-between items-center">
+            <Label htmlFor="password">Password</Label>
+            <Link
+              href="/forgot-password"
+              className="text-xs text-purple-600 hover:underline font-medium"
+            >
+              Forgot Password?
+            </Link>
+          </div>
+          <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            className="pr-10"
+            {...register("password")}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-9 text-gray-500 hover:text-gray-800"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+          {errors.password && (
+            <p className="text-xs text-red-600">{errors.password.message}</p>
+          )}
+        </div>
+
+        {errors.root && (
+          <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
+            <AlertCircle size={18} />
+            <span>{errors.root.message}</span>
+          </div>
         )}
-      </div>
-      <div className="flex-1 flex flex-col gap-2 md:w-96">
-        <Label>Passowrd</Label>
-        <Input
-          className="font-poppins bg-black text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          type="password"
-          placeholder="Password"
-          {...register("password")}
-        />
-        {errors.password && (
-          <div className="text-red-500">{errors.password.message}</div>
-        )}
-      </div>
-      </div>
-      <div className="button flex justify-center ">
-      <Button
-        className="font-poppins bg-black w-28 md:w-30 h-8 text-white py-2 px-6 rounded-lg mt-2 font-semibold hover:bg-gray-900 transition"
-        type="submit"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? "Loading..." : "Submit"}
-      </Button>
-      </div>
-      <div className="text-center pt-2 text-base">
-        Don't have an Account{" "}
-        <a href="/signup" className="text-purple-600 underline font-semibold">
-          SignUp
-        </a>
-      </div>
-      {errors.root && <div className="text-red-500">{errors.root.message}</div>}
-    </form>
+
+        {/* ## Themed Submit Button */}
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-purple-600 text-white hover:bg-purple-700 transition-colors duration-300 flex items-center justify-center gap-2 text-base h-11"
+        >
+          {isSubmitting && <LoaderCircle className="animate-spin" size={20} />}
+          {isSubmitting ? "Signing In..." : "Sign In"}
+        </Button>
+      </form>
+
+      {/* ## Consistent Footer Link */}
+      <p className="text-center text-sm text-gray-600 mt-8">
+        Don't have an account?{" "}
+        <Link href="/signup" className="font-semibold text-purple-600 hover:underline">
+          Sign Up
+        </Link>
+      </p>
+    </div>
   );
 }
 
